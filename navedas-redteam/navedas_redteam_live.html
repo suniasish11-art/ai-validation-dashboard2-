@@ -3,45 +3,6 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<script>
-(function(){
-  var PASS = 'Navedas@2026';
-  var KEY = 'navedas_auth';
-  if(sessionStorage.getItem(KEY) === '1') return;
-  document.addEventListener('DOMContentLoaded', function(){
-    document.body.style.display = 'none';
-    var overlay = document.createElement('div');
-    overlay.id = 'auth-overlay';
-    overlay.style.cssText = 'position:fixed;inset:0;background:#1e1b4b;display:flex;align-items:center;justify-content:center;z-index:99999;font-family:DM Sans,sans-serif';
-    overlay.innerHTML = '<div style="background:#fff;border-radius:14px;padding:40px 36px;min-width:320px;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,0.3);text-align:center">'
-      + '<div style="font-family:DM Mono,monospace;font-size:18px;font-weight:600;color:#7c3aed;letter-spacing:0.08em;margin-bottom:4px">Navedas Monitoring Console</div>'
-      + '<div style="font-size:11px;color:#9ca3af;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:28px">Console Access</div>'
-      + '<input id="auth-input" type="password" placeholder="Enter password" autocomplete="current-password" style="width:100%;padding:11px 14px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:14px;outline:none;box-sizing:border-box;margin-bottom:12px;font-family:DM Sans,sans-serif" />'
-      + '<div id="auth-err" style="color:#f43f5e;font-size:11px;min-height:16px;margin-bottom:8px"></div>'
-      + '<button id="auth-btn" style="width:100%;padding:11px;background:#7c3aed;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.05em;font-family:DM Mono,monospace">ENTER →</button>'
-      + '</div>';
-    document.body.parentNode.insertBefore(overlay, document.body);
-    function tryLogin(){
-      var val = document.getElementById('auth-input').value;
-      if(val === PASS){
-        sessionStorage.setItem(KEY,'1');
-        overlay.remove();
-        document.body.style.display = '';
-      } else {
-        var err = document.getElementById('auth-err');
-        err.textContent = 'Incorrect password. Try again.';
-        var inp = document.getElementById('auth-input');
-        inp.style.borderColor = '#f43f5e';
-        inp.value = '';
-        setTimeout(function(){ inp.style.borderColor = '#e5e7eb'; err.textContent=''; },2000);
-      }
-    }
-    document.getElementById('auth-btn').addEventListener('click', tryLogin);
-    document.getElementById('auth-input').addEventListener('keydown', function(e){ if(e.key==='Enter') tryLogin(); });
-    document.body.style.display = '';
-  });
-})();
-</script>
 <title>Navedas Monitoring Console</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
