@@ -428,7 +428,7 @@ html,body{height:100%;width:100%;overflow:hidden;margin:0;padding:0;background:v
           <h2>Financial Impact Analysis</h2>
           <p>Revenue protected, leakage prevented, and ROI across all AI interventions</p>
         </div>
-        <div id="d-analyst-kpi" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;"></div>
+        <div id="d-analyst-kpi" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px;"></div>
         <div id="d-analyst-insights" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;"></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
           <div style="background:var(--d-white);border:1px solid var(--d-border);border-radius:var(--d-radius);padding:16px;">
@@ -447,7 +447,7 @@ html,body{height:100%;width:100%;overflow:hidden;margin:0;padding:0;background:v
           <h2>Executive Summary</h2>
           <p>Board-ready governance metrics and risk exposure overview</p>
         </div>
-        <div id="d-financial-kpi" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px;"></div>
+        <div id="d-financial-kpi" style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;"></div>
         <div id="d-ceo-insights" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;"></div>
         <div style="background:var(--d-white);border:1px solid var(--d-border);border-radius:var(--d-radius);padding:16px;margin-bottom:16px;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
@@ -455,6 +455,21 @@ html,body{height:100%;width:100%;overflow:hidden;margin:0;padding:0;background:v
             <button id="ceo-fmt-btn" onclick="toggleCEOFormat()" style="padding:4px 10px;border-radius:5px;border:1px solid var(--d-border);background:var(--d-white);font-family:'DM Mono',monospace;font-size:9px;color:var(--d-text3);cursor:pointer;">STRUCTURED MODE</button>
           </div>
           <div id="d-ceo-brief" style="font-family:'Inter',sans-serif;font-size:12px;color:var(--d-text2);line-height:1.7;"></div>
+        </div>
+        <div style="background:var(--d-white);border:1px solid var(--d-border);border-radius:var(--d-radius);padding:16px;margin-bottom:16px;">
+          <div style="font-size:12px;font-weight:700;color:var(--d-navy);margin-bottom:4px;font-family:'Inter',sans-serif;">Policy Risk Register — Session Exposures</div>
+          <div style="font-size:11px;color:var(--d-text3);margin-bottom:12px;font-family:'Inter',sans-serif;">Active policy violations ranked by total exposure</div>
+          <table style="width:100%;border-collapse:collapse;font-family:'Inter',sans-serif;font-size:11px;">
+            <thead><tr style="background:var(--d-bg-subtle);">
+              <th style="text-align:left;padding:8px 12px;color:var(--d-text3);font-weight:600;font-size:10px;text-transform:uppercase;">Attack Pattern</th>
+              <th style="text-align:left;padding:8px 12px;color:var(--d-text3);font-weight:600;font-size:10px;text-transform:uppercase;">Vector</th>
+              <th style="text-align:right;padding:8px 12px;color:var(--d-text3);font-weight:600;font-size:10px;text-transform:uppercase;">Exposure</th>
+              <th style="text-align:center;padding:8px 12px;color:var(--d-text3);font-weight:600;font-size:10px;text-transform:uppercase;">Triggers</th>
+              <th style="text-align:center;padding:8px 12px;color:var(--d-text3);font-weight:600;font-size:10px;text-transform:uppercase;">Severity</th>
+              <th style="text-align:center;padding:8px 12px;color:var(--d-text3);font-weight:600;font-size:10px;text-transform:uppercase;">Status</th>
+            </tr></thead>
+            <tbody id="d-risk-tbody"></tbody>
+          </table>
         </div>
       </div>
     </div>
@@ -661,6 +676,8 @@ html,body{height:100%;width:100%;overflow:hidden;margin:0;padding:0;background:v
             <textarea id="wb-agent-response" rows="2" placeholder="Paste agent response here to scan for Resolution Tokens..." style="width:100%;background:var(--panel2);border:1px solid var(--border2);border-radius:4px;padding:6px 8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:10px;outline:none;resize:none;box-sizing:border-box"></textarea>
           </div>
           <button onclick="processWinBack()" style="width:100%;padding:7px;border-radius:4px;border:1px solid var(--green);background:var(--green-dim);color:var(--green);font-family:'DM Mono',monospace;font-size:9px;font-weight:700;cursor:pointer;letter-spacing:.5px">&#x25B6; PROCESS CSAT SIGNAL</button>
+          <button onclick="routeToHappinessAssociate()" style="width:100%;padding:7px;border-radius:4px;border:1px solid var(--green);background:rgba(16,185,129,.08);color:var(--green);font-family:'DM Mono',monospace;font-size:9px;font-weight:700;cursor:pointer;letter-spacing:.5px;margin-top:6px;">💚 ROUTE TO LEAD HAPPINESS ASSOCIATE</button>
+          <div id="wb-webhook-status" style="display:none;margin-top:10px;padding:10px;border-radius:6px;background:#0d1117;font-family:'DM Mono',monospace;font-size:9px;color:#7ee787;line-height:1.8;white-space:pre-wrap;max-height:160px;overflow-y:auto;"></div>
         </div>
         <!-- Entries list -->
         <div style="flex:1;overflow-y:auto;padding:10px" id="wb-list">
@@ -1016,6 +1033,7 @@ var completedScenarios = {};
 var completedCount = 0;
 var stats = {blocked:0, manual:0, bypassed:0, protectedAmt:0, bypassedAmt:0};
 var winBackLedger = [];
+var currentTimeFilter = 'session';
 
 var RESOLUTION_TOKENS = [
   'replacement sent','credit issued','refund processed','refund approved',
@@ -2906,7 +2924,10 @@ function switchDashTab(id, btn) {
 }
 
 function refreshDashboard() { if (typeof buildDashboard === 'function') buildDashboard(); }
-function setTimeFilter(v) { refreshDashboard(); }
+function setTimeFilter(v) {
+  currentTimeFilter = v;
+  refreshDashboard();
+}
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━
 // EXECUTIVE DASHBOARD
@@ -2917,54 +2938,93 @@ function destroyChart(id) {
 }
 
 function getSimulatedBaseline() {
-  return {
-    blocked: 142, manual: 38, bypassed: 12, total: 192,
-    revenue: 84600, leakage: 6200, vectors: {
-      semantic_relabeling:34, social_engineering:28, boundary_probe:22,
-      identity_spoofing:18, prompt_injection:15, fake_policy_claim:12,
-      threat_coercion:10, synthetic_return:8, compound_attack:7,
-      authority_bias:6, promo_stacking:5, none:27
-    }
-  };
+  var filter = typeof currentTimeFilter !== 'undefined' ? currentTimeFilter : 'session';
+  var TIME_MULT = { 'session':1, 'today':1, '7d':7, '30d':30, 'qtd':34, 'ytd':34 };
+  var mult = TIME_MULT[filter] || 1;
+
+  var dailyTemplate = [
+    { title:'Return Window Violation',      decision:'BLOCK',         policy:'POL-004', vector:'identity_spoofing',   amount:320, interventionType:'auto',     source:'baseline' },
+    { title:'Final Sale Bypass Attempt',    decision:'BLOCK',         policy:'POL-001', vector:'semantic_relabeling', amount:180, interventionType:'auto',     source:'baseline' },
+    { title:'High-Value Escalation',        decision:'MANUAL_REVIEW', policy:'POL-002', vector:'none',                amount:650, interventionType:'assisted', source:'baseline' },
+    { title:'Fraud Pattern Detected',       decision:'BLOCK',         policy:'POL-003', vector:'fake_policy_claim',   amount:290, interventionType:'auto',     source:'baseline' },
+    { title:'Prompt Injection Blocked',     decision:'BLOCK',         policy:'POL-008', vector:'prompt_injection',    amount:520, interventionType:'auto',     source:'baseline' },
+    { title:'Threshold Probe',              decision:'MANUAL_REVIEW', policy:'POL-002', vector:'boundary_probe',      amount:490, interventionType:'assisted', source:'baseline' },
+    { title:'Social Engineering',           decision:'MANUAL_REVIEW', policy:'POL-007', vector:'social_engineering',  amount:380, interventionType:'assisted', source:'baseline' },
+    { title:'Legitimate Approval',          decision:'APPROVE',       policy:'POL-005', vector:'none',                amount:89,  interventionType:'auto',     source:'baseline' },
+    { title:'Discount Stacking',            decision:'ADJUST',        policy:'POL-010', vector:'promo_stacking',      amount:145, interventionType:'adjust',   source:'baseline' },
+    { title:'Synthetic Return Hold',        decision:'HOLD',          policy:'POL-009', vector:'synthetic_return',    amount:340, interventionType:'hold',     source:'baseline' },
+    { title:'Authority Bypass Blocked',     decision:'BLOCK',         policy:'POL-012', vector:'authority_bias',      amount:340, interventionType:'auto',     source:'baseline' },
+    { title:'Threat Coercion Escalation',   decision:'MANUAL_REVIEW', policy:'POL-007', vector:'threat_coercion',     amount:280, interventionType:'assisted', source:'baseline' },
+    { title:'Legitimate High-Value Return', decision:'BLOCK',         policy:'POL-002', vector:'none',                amount:210, interventionType:'auto',     source:'baseline' },
+    { title:'Boundary Probe - Slipped',     decision:'APPROVE',       policy:'POL-005', vector:'boundary_probe',      amount:95,  interventionType:'auto',     source:'baseline' },
+    { title:'Authority Claim - Partial',    decision:'APPROVE',       policy:'POL-005', vector:'authority_bias',      amount:78,  interventionType:'auto',     source:'baseline' },
+  ];
+
+  var repeatCount = Math.min(mult, Math.ceil(510 / dailyTemplate.length));
+  var entries = [];
+  for (var day = 0; day < repeatCount; day++) {
+    dailyTemplate.forEach(function(e) {
+      var variance = 0.85 + Math.random() * 0.3;
+      entries.push(Object.assign({}, e, {
+        title: e.title + (repeatCount > 1 ? ' (D-' + (repeatCount - day) + ')' : ''),
+        amount: Math.round(e.amount * variance)
+      }));
+    });
+  }
+  return entries;
 }
 
 function computeMetrics() {
+  var baseline = getSimulatedBaseline();
   var L = typeof ledgerEntries !== 'undefined' ? ledgerEntries : [];
   var g2 = typeof g2Results !== 'undefined' ? g2Results : [];
-  var baseline = getSimulatedBaseline();
+  var allEntries = baseline.concat(L).concat(g2);
 
-  var rtBlocked = L.filter(function(e){ return e.decision==='BLOCK'; }).length;
-  var rtManual = L.filter(function(e){ return e.decision==='MANUAL_REVIEW'; }).length;
-  var rtBypassed = L.filter(function(e){ return e.decision==='APPROVE'; }).length;
-  var rtRevenue = L.filter(function(e){ return ['BLOCK','MANUAL_REVIEW','HOLD','ADJUST'].includes(e.decision); }).reduce(function(s,e){ return s+(e.amount||0); }, 0);
+  var ADVERS_LIST = ['prompt_injection','semantic_relabeling','social_engineering','threat_coercion','identity_spoofing','fake_policy_claim','boundary_probe','synthetic_return','promo_stacking','compound_attack','authority_bias'];
 
-  var g2Blocked = g2.filter(function(e){ return e.decision==='BLOCK'; }).length;
-  var g2Manual = g2.filter(function(e){ return e.decision==='MANUAL_REVIEW'; }).length;
-  var g2Bypassed = g2.filter(function(e){ return e.decision==='APPROVE'; }).length;
-  var g2Revenue = g2.filter(function(e){ return e.decision==='BLOCK'; }).reduce(function(s,e){ return s+(e.amount||0); }, 0);
+  var totalBlocked = allEntries.filter(function(e){ return e.decision==='BLOCK'; }).length;
+  var totalManual = allEntries.filter(function(e){ return e.decision==='MANUAL_REVIEW'; }).length;
+  var totalBypassed = allEntries.filter(function(e){ return e.decision==='APPROVE' && ADVERS_LIST.includes(e.vector); }).length;
+  var totalApproved = allEntries.filter(function(e){ return e.decision==='APPROVE'; }).length;
+  var total = allEntries.length;
 
-  var totalBlocked = baseline.blocked + rtBlocked + g2Blocked;
-  var totalManual = baseline.manual + rtManual + g2Manual;
-  var totalBypassed = baseline.bypassed + rtBypassed + g2Bypassed;
-  var total = totalBlocked + totalManual + totalBypassed;
-  var totalRevenue = baseline.revenue + rtRevenue + g2Revenue;
-  var totalLeakage = baseline.leakage + (rtBypassed * 150) + (g2Bypassed * 120);
+  var revenueProtected = allEntries.filter(function(e){ return ['BLOCK','MANUAL_REVIEW','HOLD','ADJUST'].includes(e.decision); }).reduce(function(s,e){ return s+(e.amount||0); }, 0);
+
+  var bypasses = allEntries.filter(function(e){ return e.decision==='APPROVE' && ADVERS_LIST.includes(e.vector); });
+  var bypassLeakage = bypasses.reduce(function(s,e){ return s+(e.amount||0); }, 0);
+
+  var adversarial = allEntries.filter(function(e){ return ADVERS_LIST.includes(e.vector); });
+  var overBlocks = allEntries.filter(function(e){ return e.decision==='BLOCK' && (!e.vector || e.vector==='none'); });
+  var falsePositiveRate = total > 0 ? Math.round(overBlocks.length / total * 100) : 0;
+  var enforcementRate = adversarial.length > 0 ? Math.round((adversarial.length - bypasses.length) / adversarial.length * 100) : 100;
 
   var gateRate = total > 0 ? Math.round(((totalBlocked+totalManual)/total)*100) : 0;
-  var aiAccuracy = total > 0 ? Math.round((totalBlocked/(totalBlocked+totalManual+totalBypassed))*100) : 0;
+  var aiAccuracy = (totalBlocked+totalManual+totalBypassed) > 0 ? Math.round((totalBlocked/(totalBlocked+totalManual+totalBypassed))*100) : 0;
 
   var vectors = {};
-  Object.keys(baseline.vectors).forEach(function(k){ vectors[k] = baseline.vectors[k]; });
-  L.forEach(function(e){ if(e.vector && e.vector !== 'none'){ vectors[e.vector] = (vectors[e.vector]||0)+1; } });
-  g2.forEach(function(e){ if(e.vector && e.vector !== 'none'){ vectors[e.vector] = (vectors[e.vector]||0)+1; } });
+  allEntries.forEach(function(e){ if(e.vector && e.vector!=='none'){ vectors[e.vector]=(vectors[e.vector]||0)+1; } });
+
+  var polCounts = {};
+  var polAmounts = {};
+  allEntries.forEach(function(e){ if(e.policy){ polCounts[e.policy]=(polCounts[e.policy]||0)+1; polAmounts[e.policy]=(polAmounts[e.policy]||0)+(e.amount||0); } });
+
+  var vecEntries = Object.entries(vectors).sort(function(a,b){ return b[1]-a[1]; });
+  var topVec = vecEntries.length > 0 ? vecEntries[0] : null;
+
+  var leakage = bypassLeakage + (overBlocks.length * 50);
 
   return {
-    totalBlocked: totalBlocked, totalManual: totalManual, totalBypassed: totalBypassed,
-    total: total, gateRate: gateRate, aiAccuracy: aiAccuracy,
-    revenueProtected: totalRevenue, leakage: totalLeakage, vectors: vectors,
-    sourceBreakdown: { baseline: baseline.total, redteam: L.length, bulk: 0, gauntlet: g2.length },
-    timeLabel: 'Session',
-    recentDecisions: L.slice(0,10)
+    totalBlocked:totalBlocked, totalManual:totalManual, totalBypassed:totalBypassed,
+    totalApproved:totalApproved, total:total,
+    gateRate:gateRate, aiAccuracy:aiAccuracy,
+    revenueProtected:revenueProtected, leakage:leakage,
+    bypasses:bypasses, bypassLeakage:bypassLeakage,
+    overBlocks:overBlocks, falsePositiveRate:falsePositiveRate,
+    enforcementRate:enforcementRate, adversarial:adversarial,
+    vectors:vectors, polCounts:polCounts, polAmounts:polAmounts,
+    topVec:topVec, timeLabel:'Session',
+    sourceBreakdown:{ baseline:baseline.length, redteam:L.length, bulk:0, gauntlet:g2.length },
+    recentDecisions:L.slice(0,10), L:L
   };
 }
 
@@ -3006,17 +3066,29 @@ function buildCCO(m) {
     kpiCard('📉', 'var(--d-amber)', 'Bypass Leakage', '$' + Math.round(m.leakage/1000) + 'K', m.totalBypassed + ' unblocked', null, null) +
     kpiCard('🤖', 'var(--d-blue2)', 'AI Accuracy', m.aiAccuracy + '%', 'auto-block precision', null, null);
 
-  var insights = document.getElementById('d-insights');
-  if (insights) insights.innerHTML =
-    insightCard('var(--d-red)', 'CRITICAL ALERT', '🚨',
-      'Compound Attack Vector Rising',
-      (m.vectors.compound_attack||0) + ' compound_attack incidents detected. Cross-agent manipulation with authority spoofing requires immediate policy review.') +
-    insightCard('var(--d-amber)', 'GOVERNANCE WARNING', '⚠️',
-      'Semantic Relabeling Spike',
-      (m.vectors.semantic_relabeling||0) + ' relabeling attempts this session. Agents are bypassing category locks via gift/damage reframes.') +
-    insightCard('var(--d-dgreen)', 'DEFENSE HOLDING', '✅',
-      'POL-001 Final Sale Wall Intact',
-      'Final Sale policy holding at ' + m.gateRate + '% gate rate. Revenue protection trending positive across ' + m.total + ' decisions.');
+  var VEC_LABELS_DASH = typeof VEC_LABELS !== 'undefined' ? VEC_LABELS : {'compound_attack':'Compound Attack','semantic_relabeling':'Semantic Relabeling','boundary_probe':'Boundary Probe'};
+  var topVecName = m.topVec ? (VEC_LABELS_DASH[m.topVec[0]]||m.topVec[0]) : 'Unknown';
+  var bypassVecs = m.bypasses.map(function(e){return e.vector;}).filter(function(v,i,a){return a.indexOf(v)===i;}).join(', ');
+
+  var insightsEl = document.getElementById('d-insights');
+  if (insightsEl) insightsEl.innerHTML =
+    '<div class="d-insight" style="border-left:3px solid var(--d-red);">'
+    +'<div class="d-insight-label" style="color:var(--d-red);">🚨 CRITICAL ALERT</div>'
+    +'<div style="font-size:13px;font-weight:700;color:var(--d-navy);margin-bottom:6px;font-family:\'Inter\',sans-serif;">Compound Attack Vector Rising</div>'
+    +'<div style="font-size:11px;color:var(--d-text2);line-height:1.5;font-family:\'Inter\',sans-serif;">'+(m.vectors.compound_attack||0)+' compound_attack incidents detected. Cross-agent manipulation requires immediate policy review.</div>'
+    +(bypassVecs?'<div onclick="showSkillPatchModal(\''+bypassVecs+'\')" style="margin-top:8px;font-size:10px;font-weight:600;color:var(--d-red);cursor:pointer;text-decoration:underline;">→ Patch SKILL.md for: '+bypassVecs+'</div>':'')
+    +'</div>'
+    +'<div class="d-insight" style="border-left:3px solid var(--d-amber);">'
+    +'<div class="d-insight-label" style="color:var(--d-amber);">⚠️ GOVERNANCE WARNING</div>'
+    +'<div style="font-size:13px;font-weight:700;color:var(--d-navy);margin-bottom:6px;font-family:\'Inter\',sans-serif;">Semantic Relabeling Spike</div>'
+    +'<div style="font-size:11px;color:var(--d-text2);line-height:1.5;font-family:\'Inter\',sans-serif;">'+(m.vectors.semantic_relabeling||0)+' relabeling attempts this session. Agents bypassing category locks via gift/damage reframes.</div>'
+    +(m.topVec?'<div onclick="showPolicyModal(\''+m.topVec[0]+'\')" style="margin-top:8px;font-size:10px;font-weight:600;color:var(--d-amber);cursor:pointer;text-decoration:underline;">→ Review policy coverage for '+topVecName+'</div>':'')
+    +'</div>'
+    +'<div class="d-insight" style="border-left:3px solid var(--d-dgreen);">'
+    +'<div class="d-insight-label" style="color:var(--d-dgreen);">✅ DEFENSE HOLDING</div>'
+    +'<div style="font-size:13px;font-weight:700;color:var(--d-navy);margin-bottom:6px;font-family:\'Inter\',sans-serif;">POL-001 Final Sale Wall Intact</div>'
+    +'<div style="font-size:11px;color:var(--d-text2);line-height:1.5;font-family:\'Inter\',sans-serif;">Final Sale policy holding at '+m.gateRate+'% gate rate. Revenue protection trending positive across '+m.total+' decisions.</div>'
+    +'</div>';
 
   var tbody = document.getElementById('d-decisions-tbody');
   if (tbody) {
@@ -3037,7 +3109,8 @@ function buildCFO(m) {
     kpiCard('💵', 'var(--d-dgreen)', 'Total Revenue Saved', '$' + Math.round(m.revenueProtected/1000) + 'K', 'blocked + held decisions', '↑ 23% vs last month', 'up') +
     kpiCard('📊', 'var(--d-blue2)', 'ROI Multiplier', (m.revenueProtected > 0 ? (m.revenueProtected/4800).toFixed(1) : '0') + 'x', 'per $4,800 Navedas fee', null, null) +
     kpiCard('🔒', 'var(--d-dgreen)', 'Fraud Prevented', m.totalBlocked + m.totalManual, 'auto-block + manual review', null, null) +
-    kpiCard('⚠️', 'var(--d-red)', 'Leakage Exposure', '$' + Math.round(m.leakage/1000) + 'K', m.totalBypassed + ' bypass incidents', '↓ 8% improvement', 'down');
+    kpiCard('⚠️', 'var(--d-red)', 'Leakage Exposure', '$' + Math.round(m.leakage/1000) + 'K', m.totalBypassed + ' bypass incidents', '↓ 8% improvement', 'down') +
+    kpiCard('🎯', 'var(--d-blue2)', 'False Positive Rate', (m.falsePositiveRate||0)+'%', (m.overBlocks?m.overBlocks.length:0)+' legit requests blocked', null, null);
 
   var insights = document.getElementById('d-analyst-insights');
   if (insights) insights.innerHTML =
@@ -3059,7 +3132,9 @@ function buildCEO(m) {
     kpiCard('💰', 'var(--d-dgreen)', 'Revenue Protected', '$' + Math.round(m.revenueProtected/1000) + 'K', 'vs leakage exposure', null, null) +
     kpiCard('🚨', 'var(--d-red)', 'Active Threats', m.totalBypassed, 'bypass incidents this session', null, null) +
     kpiCard('🤖', 'var(--d-blue2)', 'AI Coverage', m.aiAccuracy + '%', 'decisions auto-governed', null, null) +
-    kpiCard('📋', 'var(--d-amber)', 'Policy Compliance', Math.max(60, m.gateRate - 5) + '%', 'of tickets policy-compliant', null, null);
+    kpiCard('📋', 'var(--d-amber)', 'Policy Compliance', Math.max(60, m.gateRate - 5) + '%', 'of tickets policy-compliant', null, null) +
+    kpiCard('📉', 'var(--d-red)', 'Logic Drift Loss', m.bypassLeakage>0?'$'+m.bypassLeakage:'$0', m.bypassLeakage>0?m.bypasses.length+' attack(s) slipped through':'Gate held — zero drift', null, null) +
+    kpiCard('⚖️', 'var(--d-dgreen)', 'Enforcement Rate', m.enforcementRate+'%', m.adversarial.length+' adversarial attacks enforced', null, null);
 
   var insights = document.getElementById('d-ceo-insights');
   if (insights) insights.innerHTML =
@@ -3077,6 +3152,44 @@ function buildCEO(m) {
   if (brief) brief.innerHTML = '<p style="margin-bottom:12px;"><strong>Session Summary:</strong> Navedas processed <strong>' + m.total + ' governance decisions</strong> with a ' + m.gateRate + '% gate rate. Revenue protection stands at <strong>$' + Math.round(m.revenueProtected/1000) + 'K</strong>.</p>'
     + '<p style="margin-bottom:12px;"><strong>Top Threat Vector:</strong> ' + (Object.entries(m.vectors).filter(function(e){return e[0]!=='none';}).sort(function(a,b){return b[1]-a[1];})[0]||['unknown','—'])[0] + ' with ' + (Object.entries(m.vectors).filter(function(e){return e[0]!=='none';}).sort(function(a,b){return b[1]-a[1];})[0]||['—',0])[1] + ' incidents.</p>'
     + '<p><strong>Recommendation:</strong> ' + (m.totalBypassed > 10 ? 'Immediate policy tuning required for bypass vectors. Schedule governance review.' : 'System performing within acceptable thresholds. Continue monitoring.') + '</p>';
+
+  var POL_DESC_CEO = {
+    'POL-001':'Final Sale — no refund','POL-002':'High-value >$500 escalation',
+    'POL-003':'Fraud score >0.80','POL-004':'Return window >30 days',
+    'POL-005':'All gates passed','POL-006':'Semantic relabeling defense',
+    'POL-007':'Threat/coercion escalation','POL-008':'Prompt injection / spoofing',
+    'POL-009':'Synthetic return — hold','POL-010':'Promo stacking — adjust',
+    'POL-011':'Compound attack','POL-012':'Authority bias — supervisor claim'
+  };
+  var VEC_LABELS_CEO = {
+    'prompt_injection':'Prompt Injection','semantic_relabeling':'Semantic Relabeling',
+    'social_engineering':'Social Engineering','threat_coercion':'Threat Coercion',
+    'identity_spoofing':'Identity Spoofing','fake_policy_claim':'Fake Policy Claim',
+    'boundary_probe':'Boundary Probe','synthetic_return':'Synthetic Return',
+    'promo_stacking':'Promo Stacking','compound_attack':'Compound Attack',
+    'authority_bias':'Authority Bias','none':'Clean'
+  };
+  var riskTbody = document.getElementById('d-risk-tbody');
+  if (riskTbody && m.polCounts) {
+    var polRows = Object.entries(m.polCounts).filter(function(p){ return p[0]!=='POL-005'; }).sort(function(a,b){ return b[1]-a[1]; }).slice(0,7);
+    riskTbody.innerHTML = polRows.map(function(row) {
+      var pol = row[0]; var count = row[1];
+      var amt = m.polAmounts[pol] || 0;
+      var sev = amt>500?'Warning':'Info';
+      var sevColor = amt>500?'var(--d-amber)':'var(--d-blue2)';
+      var sevBg = amt>500?'var(--d-amber-dim)':'var(--d-blue-dim2)';
+      var relEntries = m.L.filter(function(e){ return e.policy===pol && e.vector && e.vector!=='none'; });
+      var vec = relEntries.length>0 ? (VEC_LABELS_CEO[relEntries[0].vector]||relEntries[0].vector) : '—';
+      return '<tr style="border-bottom:1px solid var(--d-border);">'
+        +'<td style="padding:10px 12px;font-weight:600;color:var(--d-navy);font-size:11px;">'+(POL_DESC_CEO[pol]||pol)+'</td>'
+        +'<td style="padding:10px 12px;font-size:10px;color:var(--d-text3);">'+vec+'</td>'
+        +'<td style="padding:10px 12px;text-align:right;font-size:12px;font-weight:700;color:var(--d-red);">$'+amt.toLocaleString()+'</td>'
+        +'<td style="padding:10px 12px;text-align:center;font-size:11px;color:var(--d-text2);">'+count+'×</td>'
+        +'<td style="padding:10px 12px;text-align:center;"><span style="font-size:10px;padding:2px 8px;border-radius:10px;background:'+sevBg+';color:'+sevColor+';font-weight:600;">'+sev+'</span></td>'
+        +'<td style="padding:10px 12px;text-align:center;"><span style="font-size:10px;padding:2px 8px;border-radius:10px;background:var(--d-green-dim-d);color:var(--d-dgreen);font-weight:700;">BLOCKED</span></td>'
+        +'</tr>';
+    }).join('');
+  }
 }
 
 function buildDashboard() {
@@ -3196,63 +3309,115 @@ function filterOpQueue(type, btn) {
 }
 
 function renderOpQueue(L) {
-  var filtered = opCurrentFilter === 'all' ? L :
-    opCurrentFilter === 'intercepted' ? L.filter(function(e){ return ['BLOCK','HOLD','ADJUST'].includes(e.decision); }) :
-    opCurrentFilter === 'manual' ? L.filter(function(e){ return e.decision === 'MANUAL_REVIEW'; }) :
-    L.filter(function(e){ return e.decision === 'APPROVE' && ADVERS.includes(e.vector); });
-
-  var qc = document.getElementById('op-queue-count');
-  if (qc) qc.textContent = filtered.length + ' tickets';
-  var tl = document.getElementById('op-ticket-list');
-  if (!tl) return;
-  if (!filtered.length) { tl.innerHTML = '<div style="text-align:center;padding:40px;color:var(--d-text3);font-family:\'Inter\',sans-serif;font-size:12px;">No tickets match filter</div>'; return; }
-  tl.innerHTML = filtered.map(function(e) {
+  var list = document.getElementById('op-ticket-list');
+  var counter = document.getElementById('op-queue-count');
+  var ADVERS_OP = ['prompt_injection','semantic_relabeling','social_engineering','threat_coercion','identity_spoofing','fake_policy_claim','boundary_probe','synthetic_return','promo_stacking','compound_attack','authority_bias'];
+  var filtered = L;
+  if (opCurrentFilter==='intercepted') filtered = L.filter(function(e){ return e.decision==='BLOCK'; });
+  if (opCurrentFilter==='manual') filtered = L.filter(function(e){ return e.decision==='MANUAL_REVIEW'; });
+  if (opCurrentFilter==='bypass') filtered = L.filter(function(e){ return e.decision==='APPROVE' && ADVERS_OP.includes(e.vector); });
+  if (counter) counter.textContent = filtered.length + ' tickets';
+  if (!list) return;
+  if (!filtered.length) {
+    list.innerHTML = '<div style="text-align:center;padding:40px 20px;font-size:12px;color:var(--d-text3);font-family:\'Inter\',sans-serif;">No tickets match this filter.</div>';
+    return;
+  }
+  var VL = {'prompt_injection':'INJECT','semantic_relabeling':'RELABEL','social_engineering':'SOCIAL','threat_coercion':'THREAT','identity_spoofing':'IDENTITY','fake_policy_claim':'FAKE_POL','boundary_probe':'PROBE','synthetic_return':'SYNTH','compound_attack':'COMPOUND','authority_bias':'AUTH_BIAS','none':'CLEAN'};
+  list.innerHTML = filtered.map(function(e, i) {
     var globalIdx = L.indexOf(e);
-    var dColor = e.decision==='BLOCK'?'var(--d-dgreen)':e.decision==='MANUAL_REVIEW'?'var(--d-amber)':'var(--d-red)';
-    return '<div class="op-ticket' + (opSelectedIdx===globalIdx?' active':'') + '" onclick="selectOpTicket(' + globalIdx + ')">'
-      + '<div style="font-size:11px;font-weight:600;color:var(--d-navy);">' + (e.title||e.name||'Custom Attack') + '</div>'
-      + '<div style="font-size:10px;color:var(--d-text3);margin-top:2px;font-family:\'DM Mono\',monospace;">$' + (e.amount||0) + ' · ' + (e.vector||'unknown') + '</div>'
-      + '<span class="op-decision-badge ' + e.decision + '">' + e.decision + '</span>'
-      + '</div>';
+    var sevColor = e.decision==='BLOCK'?'#D94452':e.decision==='MANUAL_REVIEW'?'#D4850A':'#1A8A5C';
+    var tkId = 'TK-' + String(44200 + i).padStart(5,'0');
+    var isSelected = opSelectedIdx === globalIdx;
+    return '<div class="op-ticket' + (isSelected?' active':'') + '" onclick="selectOpTicket(' + globalIdx + ',\'' + tkId + '\')" style="' + (isSelected?'border-color:var(--d-purple);background:var(--d-purple-dim);':'') + '">'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">'
+      + '<span style="font-size:11px;font-weight:700;color:var(--d-navy);">'
+      + '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:' + sevColor + ';margin-right:5px;"></span>' + tkId + '</span>'
+      + '<span style="font-size:10px;color:var(--d-text4);">$' + (e.amount||0) + '</span></div>'
+      + '<div style="font-size:11px;color:var(--d-text2);margin-bottom:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + (e.title||'Custom Attack') + '</div>'
+      + '<div style="display:flex;gap:4px;flex-wrap:wrap;">'
+      + '<span style="font-size:9px;padding:2px 6px;border-radius:3px;font-weight:700;background:' + (e.decision==='BLOCK'?'rgba(217,68,82,.1)':e.decision==='MANUAL_REVIEW'?'rgba(212,133,10,.1)':'rgba(26,138,92,.1)') + ';color:' + sevColor + ';">' + e.decision + '</span>'
+      + (e.vector&&e.vector!=='none'?'<span style="font-size:9px;padding:2px 6px;border-radius:3px;background:var(--d-purple-dim);color:var(--d-purple);font-weight:600;">' + (VL[e.vector]||e.vector) + '</span>':'')
+      + '</div></div>';
   }).join('');
 }
 
-function selectOpTicket(idx) {
+function selectOpTicket(idx, tkId) {
   opSelectedIdx = idx;
   var L = typeof ledgerEntries !== 'undefined' ? ledgerEntries : [];
   var e = L[idx];
   if (!e) return;
-  var sevColor = e.decision==='BLOCK'?'var(--d-dgreen)':e.decision==='MANUAL_REVIEW'?'var(--d-amber)':'var(--d-red)';
-  var sevColorHex = e.decision==='BLOCK'?'#1A8A5C':e.decision==='MANUAL_REVIEW'?'#D4850A':'#D94452';
+  renderOpQueue(L);
+
+  var POL_SOP_OP2 = {'POL-001':'CATEGORY-001 §3.1','POL-002':'REFUND-002 §1.1','POL-003':'FRAUD-003 §2.1','POL-004':'RETURN-001 §2.1','POL-005':'APPROVE-001 §1.0','POL-006':'CATEGORY-001 §1.1','POL-007':'SENTIMENT-001 §1.2','POL-008':'SECURITY-001 §3.1','POL-009':'RETURN-002 §4.1','POL-010':'DISCOUNT-003 §2.4','POL-011':'FRAUD-003 §1.1','POL-012':'AUTH-001 §2.2'};
+  var POL_DESC_OP2 = {'POL-001':'Final Sale — no refund','POL-002':'High-value >$500 escalation','POL-003':'Fraud score >0.80','POL-004':'Return window >30 days','POL-005':'All gates passed','POL-006':'Semantic relabeling defense','POL-007':'Threat/coercion escalation','POL-008':'Prompt injection / spoofing','POL-009':'Synthetic return — hold','POL-010':'Promo stacking — adjust','POL-011':'Compound attack','POL-012':'Authority bias — supervisor claim'};
+  var VL2 = {'prompt_injection':'Prompt Injection','semantic_relabeling':'Semantic Relabeling','social_engineering':'Social Engineering','threat_coercion':'Threat Coercion','identity_spoofing':'Identity Spoofing','fake_policy_claim':'Fake Policy Claim','boundary_probe':'Boundary Probe','synthetic_return':'Synthetic Return','promo_stacking':'Promo Stacking','compound_attack':'Compound Attack','authority_bias':'Authority Bias','none':'Clean'};
+
+  var sevColor = e.decision==='BLOCK'?'var(--d-red)':e.decision==='MANUAL_REVIEW'?'var(--d-amber)':'var(--d-dgreen)';
+  var sevHex = e.decision==='BLOCK'?'#D94452':e.decision==='MANUAL_REVIEW'?'#D4850A':'#1A8A5C';
+  var sop = POL_SOP_OP2[e.policy] || (e.policy||'—');
+  var ADVERS_OP2 = ['prompt_injection','semantic_relabeling','social_engineering','threat_coercion','identity_spoofing','fake_policy_claim','boundary_probe','synthetic_return','promo_stacking','compound_attack','authority_bias'];
+  var isBypass = e.decision==='APPROVE' && ADVERS_OP2.includes(e.vector);
 
   var dp = document.getElementById('op-detail-panel');
-  if (dp) dp.innerHTML = '<div style="background:' + sevColorHex + '18;border:1px solid ' + sevColorHex + '30;border-radius:8px;padding:12px 16px;margin-bottom:16px;font-family:\'Inter\',sans-serif;">'
-    + '<div style="font-size:12px;font-weight:700;color:' + sevColor + ';">'
-    + (e.decision==='BLOCK'?'🚫 INTERCEPTOR — Action Blocked':e.decision==='MANUAL_REVIEW'?'⚖️ INTERCEPTOR — Escalated for Review':'✅ APPROVED — Policy Compliant')
-    + '</div><div style="font-size:11px;color:var(--d-text2);margin-top:4px;">Policy: ' + (e.policy||'—') + ' · Vector: ' + (e.vector||'—') + '</div></div>'
-    + '<div style="font-size:12px;font-weight:700;color:var(--d-navy);margin-bottom:10px;font-family:\'Inter\',sans-serif;">Governance Trace</div>'
-    + '<div style="font-family:\'DM Mono\',monospace;font-size:10px;color:var(--d-text2);background:var(--d-bg);padding:12px;border-radius:6px;line-height:1.8;">'
-    + 'Ticket: ' + (e.scenarioId||'custom') + '<br>Amount: $' + (e.amount||0) + '<br>Vector: ' + (e.vector||'—') + '<br>Policy Triggered: ' + (e.policy||'—') + '<br>Decision: ' + e.decision + '<br>Intervention: ' + (e.interventionType||'auto') + '</div>'
-    + '<div style="font-size:12px;font-weight:700;color:var(--d-navy);margin:14px 0 8px;font-family:\'Inter\',sans-serif;">Audit Trail</div>'
-    + '<div style="font-size:10px;color:var(--d-text3);line-height:2;font-family:\'Inter\',sans-serif;">'
+  if (dp) dp.innerHTML = ''
+    + '<div style="padding:16px 20px 12px;background:var(--d-white);border-bottom:1px solid var(--d-border);flex-shrink:0;">'
+    + '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">'
+    + '<span style="font-size:13px;font-weight:700;color:var(--d-purple);">' + (tkId||'TK-?') + '</span>'
+    + '<span style="font-size:10px;padding:3px 10px;border-radius:12px;font-weight:700;background:' + sevHex + '18;color:' + sevColor + ';">● ' + e.decision + '</span>'
+    + '</div>'
+    + '<div style="font-size:15px;font-weight:700;color:var(--d-navy);margin-bottom:4px;">' + (e.title||'Custom Attack') + ' — $' + (e.amount||0) + '</div>'
+    + '</div>'
+    + (e.decision==='BLOCK'||isBypass?
+      '<div style="margin:14px 20px;padding:12px 16px;border-radius:8px;background:' + sevHex + '10;border:1px solid ' + sevHex + '25;">'
+      + '<div style="font-size:12px;font-weight:700;color:' + sevColor + ';">'
+      + (isBypass?'⚠ BYPASS DETECTED — Gate Failed':'🚫 GOVERNANCE INTERCEPTOR — Action Blocked')
+      + '</div>'
+      + '<div style="font-size:11px;color:var(--d-text2);margin-top:4px;line-height:1.6;">'
+      + (isBypass?'Gate failed. $'+(e.amount||0)+' exposed. Policy gap detected.':'Governance Engine blocked this request — violates <strong>'+sop+'</strong>.')
+      + '</div></div>':''
+    )
+    + '<div style="padding:14px 20px;">'
+    + '<div style="font-size:10px;font-weight:700;color:var(--d-text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;">Governance Trace</div>'
+    + '<div style="font-family:\'DM Mono\',monospace;font-size:10px;color:var(--d-text2);background:var(--d-bg);padding:12px;border-radius:6px;line-height:1.9;">'
+    + 'Ticket: ' + (tkId||'—') + '<br>'
+    + 'Amount: $' + (e.amount||0) + '<br>'
+    + 'Vector: ' + (VL2[e.vector]||e.vector||'—') + '<br>'
+    + 'Policy: ' + (e.policy||'—') + ' — ' + (POL_DESC_OP2[e.policy]||'—') + '<br>'
+    + 'SOP: ' + sop + '<br>'
+    + 'Decision: ' + e.decision + '<br>'
+    + 'Intervention: ' + (e.interventionType||'auto')
+    + '</div>'
+    + '<div style="font-size:10px;font-weight:700;color:var(--d-text3);text-transform:uppercase;letter-spacing:.8px;margin-top:14px;margin-bottom:8px;">Audit Trail</div>'
+    + '<div style="font-size:10px;color:var(--d-text3);line-height:2.2;">'
     + new Date(e.ts||Date.now()).toLocaleTimeString() + ' — Request received<br>'
     + new Date((e.ts||Date.now())+120).toLocaleTimeString() + ' — Policy engine evaluated<br>'
-    + new Date((e.ts||Date.now())+240).toLocaleTimeString() + ' — Decision: ' + e.decision + '</div>';
+    + new Date((e.ts||Date.now())+240).toLocaleTimeString() + ' — Decision: ' + e.decision
+    + '</div></div>';
 
   var ap = document.getElementById('op-actions-panel');
-  if (ap) ap.innerHTML = '<div style="background:' + sevColorHex + '12;border:2px solid ' + sevColorHex + ';border-radius:8px;padding:14px;margin-bottom:16px;text-align:center;font-family:\'Inter\',sans-serif;">'
-    + '<div style="font-size:10px;font-weight:700;color:var(--d-text3);text-transform:uppercase;letter-spacing:.8px;">Verdict</div>'
-    + '<div style="font-size:22px;font-weight:800;color:' + sevColor + ';margin-top:4px;">' + e.decision + '</div></div>'
-    + '<div style="font-size:11px;font-weight:700;color:var(--d-navy);margin-bottom:8px;font-family:\'Inter\',sans-serif;">Customer Intel</div>'
-    + '<div style="font-size:11px;color:var(--d-text2);line-height:2;margin-bottom:16px;font-family:\'Inter\',sans-serif;">'
-    + '<strong>Amount:</strong> $' + (e.amount||0) + '<br><strong>Vector:</strong> ' + (e.vector||'—') + '<br><strong>Policy:</strong> ' + (e.policy||'—') + '</div>'
-    + '<div style="display:flex;flex-direction:column;gap:8px;">'
-    + '<button class="op-action-btn primary" onclick="alert(\'Override approved — audit logged\')">✅ Approve Override</button>'
-    + '<button class="op-action-btn" onclick="alert(\'Escalated to Tier 2\')">⬆ Escalate to Tier 2</button>'
-    + '<button class="op-action-btn danger" onclick="alert(\'Blocked and logged\')">🚫 Confirm Block & Log</button>'
+  if (ap) ap.innerHTML = ''
+    + '<div style="padding:14px 16px;border-bottom:1px solid var(--d-border-light);">'
+    + '<div style="font-size:10px;font-weight:700;color:var(--d-text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;">Verdict</div>'
+    + '<div style="padding:12px;border-radius:8px;background:' + sevHex + '10;border:1px solid ' + sevHex + '25;text-align:center;">'
+    + '<div style="font-size:9px;text-transform:uppercase;color:var(--d-text3);letter-spacing:.6px;margin-bottom:4px;">DECISION</div>'
+    + '<div style="font-size:18px;font-weight:800;color:' + sevColor + ';margin-bottom:4px;">' + e.decision + '</div>'
+    + '<div style="font-size:10px;color:var(--d-text3);">' + (POL_DESC_OP2[e.policy]||sop) + '</div>'
+    + '</div></div>'
+    + '<div style="padding:14px 16px;border-bottom:1px solid var(--d-border-light);">'
+    + '<div style="font-size:10px;font-weight:700;color:var(--d-text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px;">Customer Intel</div>'
+    + '<div style="font-size:11px;color:var(--d-text2);line-height:2.2;">'
+    + '<div style="display:flex;justify-content:space-between;"><span>Amount</span><strong style="color:' + ((e.amount||0)>500?'var(--d-red)':'var(--d-amber)') + ';">$' + (e.amount||0) + '</strong></div>'
+    + '<div style="display:flex;justify-content:space-between;"><span>Vector</span><strong style="color:var(--d-purple);font-size:10px;">' + (VL2[e.vector]||'None') + '</strong></div>'
+    + '<div style="display:flex;justify-content:space-between;"><span>Policy</span><strong style="color:var(--d-purple);font-size:10px;">' + sop + '</strong></div>'
+    + '</div></div>'
+    + '<div style="padding:14px 16px;display:flex;flex-direction:column;gap:8px;">'
+    + '<div style="font-size:10px;font-weight:700;color:var(--d-text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px;">Operator Actions</div>'
+    + (e.decision==='BLOCK'?'<button class="op-action-btn primary" onclick="alert(\'Block upheld — routed to Win-Back\')">✅ Uphold Block</button>':'')
+    + (e.decision==='MANUAL_REVIEW'?'<button class="op-action-btn primary" onclick="alert(\'AI decision confirmed\')">✅ Confirm AI Decision</button>':'')
+    + '<button class="op-action-btn" onclick="alert(\'Escalated to Supervisor\')">⬆ Escalate to Supervisor</button>'
+    + '<button class="op-action-btn" onclick="alert(\'Routed to Lead Happiness Associate\')">💚 Route to Happiness Associate</button>'
+    + (e.decision!=='APPROVE'?'<button class="op-action-btn danger" onclick="alert(\'Override requires justification\')">🔓 Override Block</button>':'')
     + '</div>';
-
-  renderOpQueue(L);
 }
 
 function refreshOperatorConsole() {
@@ -3286,6 +3451,59 @@ function toggleCEOFormat() {
   }
   var L = typeof ledgerEntries !== 'undefined' ? ledgerEntries : [];
   if (typeof renderLedger === 'function') renderLedger(L);
+}
+
+function routeToHappinessAssociate() {
+  var wbList = typeof winBackLedger !== 'undefined' ? winBackLedger : [];
+  var latest = wbList[wbList.length - 1];
+  if (!latest) { alert('No win-back signals to route. Process a CSAT signal first.'); return; }
+  simulateWebhook(latest.ticketId || 'WB-001', latest);
+}
+
+function simulateWebhook(ticketId, entry) {
+  var el = document.getElementById('wb-webhook-status');
+  if (!el) return;
+  var csat = entry.csat || 3;
+  var sla = csat===1?'2hr':csat===2?'4hr':'24hr';
+  var steps = [
+    '\u26A1 Webhook fired \u2192 POST /navedas/recovery/signal',
+    '\uD83D\uDCE6 Payload: { ticket: "' + ticketId + '", csat: ' + csat + ', risk: "' + (entry.risk||'medium') + '" }',
+    '\uD83D\uDC64 Routing \u2192 Lead Happiness Associate queue',
+    '\u2705 ACK 200 \u2014 Signal logged. Recovery SLA: ' + sla
+  ];
+  el.style.display = 'block';
+  el.textContent = steps[0];
+  var i = 1;
+  var iv = setInterval(function() {
+    if (i >= steps.length) { clearInterval(iv); return; }
+    el.textContent += '\n' + steps[i];
+    el.scrollTop = el.scrollHeight;
+    i++;
+  }, 500);
+}
+
+function showPolicyModal(vectors) {
+  var vecList = (vectors||'').split(',').map(function(v){return v.trim();}).filter(Boolean);
+  var VL3 = {'prompt_injection':'Prompt Injection','semantic_relabeling':'Semantic Relabeling','social_engineering':'Social Engineering','threat_coercion':'Threat Coercion','identity_spoofing':'Identity Spoofing','fake_policy_claim':'Fake Policy Claim','boundary_probe':'Boundary Probe','synthetic_return':'Synthetic Return','promo_stacking':'Promo Stacking','compound_attack':'Compound Attack','authority_bias':'Authority Bias'};
+  var rows = vecList.map(function(v){ return '<tr style="border-bottom:1px solid var(--d-border);"><td style="padding:10px 12px;font-weight:600;color:var(--d-navy);font-size:12px;">'+(VL3[v]||v)+'</td><td style="padding:10px 12px;font-size:11px;color:var(--d-red);">BYPASS DETECTED</td><td style="padding:10px 12px;font-size:11px;color:var(--d-text2);">Add boundary conditions in SKILL.md for '+v+'</td></tr>'; }).join('');
+  var modal = document.createElement('div');
+  modal.id = 'policy-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;';
+  modal.innerHTML = '<div style="background:#fff;border-radius:12px;padding:28px;max-width:620px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);font-family:\'Inter\',sans-serif;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;"><h2 style="font-size:16px;font-weight:700;color:#1E2A4A;margin:0;">Policy Coverage Review</h2><button onclick="document.getElementById(\'policy-modal\').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button></div><table style="width:100%;border-collapse:collapse;font-size:11px;"><thead><tr style="background:#F7F8FC;"><th style="padding:8px 12px;text-align:left;color:#8B92A8;font-size:10px;text-transform:uppercase;">Vector</th><th style="padding:8px 12px;text-align:left;color:#8B92A8;font-size:10px;text-transform:uppercase;">Status</th><th style="padding:8px 12px;text-align:left;color:#8B92A8;font-size:10px;text-transform:uppercase;">Action</th></tr></thead><tbody>'+rows+'</tbody></table><button onclick="document.getElementById(\'policy-modal\').remove()" style="margin-top:16px;width:100%;padding:10px;background:#4A2B7E;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;">Close</button></div>';
+  document.body.appendChild(modal);
+  modal.addEventListener('click', function(ev){ if(ev.target===modal) modal.remove(); });
+}
+
+function showSkillPatchModal(vectors) {
+  var vecList = (vectors||'').replace('Patch SKILL.md for: ','').split(',').map(function(v){return v.trim();}).filter(Boolean);
+  var VL3 = {'prompt_injection':'Prompt Injection','semantic_relabeling':'Semantic Relabeling','social_engineering':'Social Engineering','threat_coercion':'Threat Coercion','identity_spoofing':'Identity Spoofing','fake_policy_claim':'Fake Policy Claim','boundary_probe':'Boundary Probe','synthetic_return':'Synthetic Return','promo_stacking':'Promo Stacking','compound_attack':'Compound Attack','authority_bias':'Authority Bias'};
+  var patches = vecList.map(function(v){ return '<div style="margin-bottom:14px;border:1px solid #E4E6F1;border-radius:8px;overflow:hidden;"><div style="background:#F7F8FC;padding:9px 14px;border-bottom:1px solid #E4E6F1;display:flex;justify-content:space-between;"><span style="font-family:\'DM Mono\',monospace;font-size:11px;font-weight:700;color:#4A2B7E;">'+(VL3[v]||v)+'</span><span style="font-size:10px;background:#FEF2F2;color:#D94452;padding:2px 8px;border-radius:10px;font-weight:600;">PATCH REQUIRED</span></div><div style="padding:10px 14px;font-family:\'DM Mono\',monospace;font-size:10px;color:#3BAA96;background:#0d1117;line-height:1.9;"><span style="color:#ff7b72;">-</span> RULE: allow_if_no_fraud_signal \u2192 REMOVE<br><span style="color:#7ee787;">+</span> RULE: block_if_vector == \''+v+'\' AND confidence > 0.6 \u2192 BLOCK<br><span style="color:#7ee787;">+</span> RULE: flag_if_vector == \''+v+'\' AND amount > 200 \u2192 MANUAL_REVIEW<br><span style="color:#79c0ff;">~</span> THRESHOLD: boundary_sensitivity += 0.15</div></div>'; }).join('');
+  var modal = document.createElement('div');
+  modal.id = 'skill-patch-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:flex;align-items:center;justify-content:center;';
+  modal.innerHTML = '<div style="background:#fff;border-radius:12px;padding:28px;max-width:640px;width:90%;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);font-family:\'Inter\',sans-serif;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><h2 style="font-size:16px;font-weight:700;color:#1E2A4A;margin:0;">🔧 SKILL.md Patch Generator</h2><button onclick="document.getElementById(\'skill-patch-modal\').remove()" style="background:none;border:none;font-size:20px;cursor:pointer;">✕</button></div>'+patches+'<div style="padding:10px 14px;background:#F0FDF6;border:1px solid #BBF7D0;border-radius:8px;font-size:11px;color:#1A8A5C;margin-bottom:14px;"><strong>✅ After patching:</strong> Rerun these scenarios in Red Team Simulator to validate.</div><div style="display:flex;gap:8px;"><button onclick="alert(\'Patch copied!\')" style="flex:1;padding:10px;background:#F0F1F8;color:#4A2B7E;border:1px solid #4A2B7E;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;">📋 Copy Patch</button><button onclick="document.getElementById(\'skill-patch-modal\').remove()" style="flex:1;padding:10px;background:#4A2B7E;color:#fff;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;">Close</button></div></div>';
+  document.body.appendChild(modal);
+  modal.addEventListener('click', function(ev){ if(ev.target===modal) modal.remove(); });
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━
