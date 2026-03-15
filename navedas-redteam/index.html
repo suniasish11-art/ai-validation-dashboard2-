@@ -441,11 +441,11 @@ html,body{height:100%;width:100%;overflow:hidden;margin:0;padding:0;background:v
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
           <div style="background:var(--d-white);border:1px solid var(--d-border);border-radius:var(--d-radius);padding:16px;">
             <div style="font-size:12px;font-weight:700;color:var(--d-navy);margin-bottom:12px;font-family:'Inter',sans-serif;">Attack Vector Heatmap</div>
-            <canvas id="d-vector-chart" height="180"></canvas>
+            <div style="position:relative;height:200px;"><canvas id="d-vector-chart"></canvas></div>
           </div>
           <div style="background:var(--d-white);border:1px solid var(--d-border);border-radius:var(--d-radius);padding:16px;">
             <div style="font-size:12px;font-weight:700;color:var(--d-navy);margin-bottom:12px;font-family:'Inter',sans-serif;">Decision Distribution</div>
-            <canvas id="d-decision-chart" height="180"></canvas>
+            <div style="position:relative;height:200px;"><canvas id="d-decision-chart"></canvas></div>
           </div>
         </div>
         <div style="background:var(--d-white);border:1px solid var(--d-border);border-radius:var(--d-radius);padding:16px;">
@@ -472,11 +472,11 @@ html,body{height:100%;width:100%;overflow:hidden;margin:0;padding:0;background:v
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
           <div style="background:var(--d-white);border:1px solid var(--d-border);border-radius:var(--d-radius);padding:16px;">
             <div style="font-size:12px;font-weight:700;color:var(--d-navy);margin-bottom:12px;font-family:'Inter',sans-serif;">Revenue Protection Trend</div>
-            <canvas id="d-revenue-chart" height="180"></canvas>
+            <div style="position:relative;height:200px;"><canvas id="d-revenue-chart"></canvas></div>
           </div>
           <div style="background:var(--d-white);border:1px solid var(--d-border);border-radius:var(--d-radius);padding:16px;">
             <div style="font-size:12px;font-weight:700;color:var(--d-navy);margin-bottom:12px;font-family:'Inter',sans-serif;">Policy Trigger Frequency</div>
-            <canvas id="d-policy-chart" height="180"></canvas>
+            <div style="position:relative;height:200px;"><canvas id="d-policy-chart"></canvas></div>
           </div>
         </div>
       </div>
@@ -3150,7 +3150,7 @@ function initDashCharts(page) {
           labels: vecKeys.map(function(k){ return k.replace('_',' ').substring(0,12); }),
           datasets: [{ data: vecKeys.map(function(k){ return m.vectors[k]; }), backgroundColor: 'rgba(74,43,126,0.7)', borderRadius: 4 }]
         },
-        options: { responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true, ticks:{font:{size:9}}}, x:{ticks:{font:{size:9}}}} }
+        options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true, ticks:{font:{size:9}}}, x:{ticks:{font:{size:9}}}} }
       });
     }
     destroyChart('d-decision-chart');
@@ -3162,7 +3162,7 @@ function initDashCharts(page) {
           labels: ['Blocked','Manual Review','Bypassed'],
           datasets: [{ data: [m.totalBlocked, m.totalManual, m.totalBypassed], backgroundColor: ['rgba(26,138,92,0.8)','rgba(212,133,10,0.8)','rgba(217,68,82,0.8)'], borderWidth: 0 }]
         },
-        options: { responsive:true, plugins:{legend:{position:'bottom',labels:{font:{size:9},padding:8}}} }
+        options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom',labels:{font:{size:9},padding:8}}} }
       });
     }
   }
@@ -3176,7 +3176,7 @@ function initDashCharts(page) {
           labels: ['Week 1','Week 2','Week 3','Week 4','Week 5','Now'],
           datasets: [{ label:'Revenue Protected', data:[42000,58000,61000,74000,79000,m.revenueProtected], borderColor:'rgba(26,138,92,1)', backgroundColor:'rgba(26,138,92,0.1)', fill:true, tension:0.4 }]
         },
-        options: { responsive:true, plugins:{legend:{display:false}}, scales:{y:{ticks:{font:{size:9},callback:function(v){return '$'+Math.round(v/1000)+'K';}}}}}
+        options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{ticks:{font:{size:9},callback:function(v){return '$'+Math.round(v/1000)+'K';}}}}}
       });
     }
     destroyChart('d-policy-chart');
@@ -3192,7 +3192,7 @@ function initDashCharts(page) {
           labels: pKeys,
           datasets: [{ data: pKeys.map(function(k){ return policies[k]||2; }), backgroundColor:'rgba(37,99,235,0.7)', borderRadius:4 }]
         },
-        options: { responsive:true, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true,ticks:{font:{size:9}}},x:{ticks:{font:{size:9}}}} }
+        options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true,ticks:{font:{size:9}}},x:{ticks:{font:{size:9}}}} }
       });
     }
   }
