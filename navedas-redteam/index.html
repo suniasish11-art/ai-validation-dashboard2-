@@ -3328,14 +3328,12 @@ function toggleCEOFormat() {
 }
 
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━
-// AUTO-INIT
+// AUTO-INIT (script is at bottom of body — DOM is already ready)
 // ━━━━━━━━━━━━━━━━━━━━━━━━━━━
-document.addEventListener('DOMContentLoaded', function() {
+if (typeof buildDashboard === 'function') buildDashboard();
+setTimeout(function() {
   if (typeof buildDashboard === 'function') buildDashboard();
-  setTimeout(function() {
-    if (typeof buildDashboard === 'function') buildDashboard();
-  }, 300);
-});
+}, 300);
 </script>
 </body>
 </html>
