@@ -389,11 +389,11 @@ html,body{height:100%;width:100%;overflow:hidden;margin:0;padding:0;background:v
 <div class="app-shell">
   <!-- Sidebar Navigation Rail -->
   <nav class="icon-rail">
-    <div class="rail-item" id="rail-exec" onclick="switchView('exec',this)" title="Executive Dashboard">
+    <div class="rail-item active" id="rail-exec" onclick="switchView('exec',this)" title="Executive Dashboard">
       <span style="font-size:16px">📊</span>
       <span class="rail-tip">Executive Dashboard</span>
     </div>
-    <div class="rail-item active" id="rail-redteam" onclick="switchView('redteam',this)" title="Red Team Simulator">
+    <div class="rail-item" id="rail-redteam" onclick="switchView('redteam',this)" title="Red Team Simulator">
       <span style="font-size:16px">🛡</span>
       <span class="rail-tip">Red Team Simulator</span>
     </div>
@@ -404,7 +404,7 @@ html,body{height:100%;width:100%;overflow:hidden;margin:0;padding:0;background:v
   </nav>
 
   <!-- VIEW: Executive Dashboard -->
-  <div class="view" id="view-exec">
+  <div class="view active" id="view-exec">
     <div style="height:52px;background:var(--d-white);border-bottom:1px solid var(--d-border);display:flex;align-items:center;padding:0 24px;gap:12px;flex-shrink:0;box-shadow:0 1px 2px rgba(30,42,74,0.04);font-family:'Inter',sans-serif;">
       <span style="font-size:15px;font-weight:800;color:var(--d-navy);">Navedas Monitoring Console</span>
       <span style="font-size:11px;color:var(--d-text3);padding:3px 10px;border-radius:12px;background:var(--d-bg-subtle);">Executive Dashboard</span>
@@ -500,7 +500,7 @@ html,body{height:100%;width:100%;overflow:hidden;margin:0;padding:0;background:v
   </div>
 
   <!-- VIEW: Red Team Simulator -->
-  <div class="view active" id="view-redteam">
+  <div class="view" id="view-redteam">
     <div class="shell">
       <div class="topbar">
     <span class="logo">Navedas Monitoring Console</span>
